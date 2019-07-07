@@ -1,0 +1,38 @@
+{
+  "base_transaction": null,
+  "actions": [
+    {
+      "type": "spend_account_unspent_output",
+      "output_id": "dc218cade1b1fd1e4b59b90be63ba9d2ce6c72748b83e1e0be41a0ebbe281303",
+      "arguments": [
+        {
+          "type": "raw_tx_signature",
+          "raw_data": {
+            "xpub": "a8d18922ae6600629d72473dd01815a74bdfbec210605a9b0d2a96d93faa5eecda17e8d51c863c158f7bcf5df80c3d4d6c2726b9a07bc2c7e4ea16e499b1af73",
+            "derivation_path": [
+              "2c000000",
+              "99000000",
+              "01000000",
+              "01000000",
+              "01000000"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "control_program",
+      "asset_id": "82ec80b9f81217b8c912322fb3f505b1e542b4e58cebb7c128081fbe0d8584c2",
+      "amount": 10000000000,
+      "control_program": "00143acfa10b486c9690c91ef8112f0472774d1c6b05"
+    },
+    {
+      "type": "spend_account",
+      "asset_id": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "amount": 100000000,
+      "account_id": "0UKOBDPC00A02"
+    }
+  ],
+  "ttl": 0,
+  "time_range": 1521625823
+}

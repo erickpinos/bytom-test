@@ -1,0 +1,10 @@
+
+{
+	"contract": "contract LockPosition(expireBlockHeight: Integer, saver: Program, saver_key: PublicKey) locks lockAmount of lockAsset { clause expire(sig: Signature) { verify above(expireBlockHeight)  verify checkTxSig(saver_key, sig) lock lockAmount of lockAsset with saver } }",
+	"args": [
+		{"integer": 100 },
+		{"string": "00143acfa10b486c9690c91ef8112f0472774d1c6b05"},
+		{"string": "0ff578cc3228fe697a47d178081a1d642e677c637f1c9ecb7434af8130873582"}
+	]
+}
+

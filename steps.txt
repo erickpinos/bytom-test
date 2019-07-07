@@ -1,0 +1,23 @@
+erick: 0UKOBDPC00A02
+key: 0ff578cc3228fe697a47d178081a1d642e677c637f1c9ecb7434af8130873582
+program: 00143acfa10b486c9690c91ef8112f0472774d1c6b05
+
+mel: 0UKOEPK7G0A04
+key: 9485475a74ce493a6299b44b7488997e9278f32d6aee00b15fa2a07ee4ce2688
+program: 001403fa045e4417f378243c2779f11b8204d5cd82a9
+
+curl -X POST localhost:9888/list-pubkeys -d @create-account-receiver.json
+
+curl -X POST localhost:9888/compile -d @compilation-payload.json >> output.txt
+
+curl -X POST localhost:9888/build-transaction -d @build-contractLoad-tx-payload.json >> output.txt
+
+curl -X POST localhost:9888/sign-transaction -d @sign-contractLoad-tx-payload.json >> output.txt
+
+curl -X POST localhost:9888/submit-transaction -d "{ \"raw_transaction\":\"0701dfd5c8d5050201990101960152f31d953d62f408f5db7f7dfa957a92f44db93fba009e3741e84f4b5bf3167b82ec80b9f81217b8c912322fb3f505b1e542b4e58cebb7c128081fbe0d8584c280c8afa02502014e200ff578cc3228fe697a47d178081a1d642e677c637f1c9ecb7434af81308735821600143acfa10b486c9690c91ef8112f0472774d1c6b0501647410cd9f697b7bae7cac6900c3c251547ac100c0420140116c51b7a4f5ada22e586669c0af3044b3123b9d04faaf972a743eb68b17b4333ff8d05e577ecd690fc786c91586a0c9c8db46c1b757fe931bdb73149767a20d0160015e2c1e6c0367ee2fbe0dc01b3e599a8f4e4460a9c83e7752253f903c9470440d74ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80dbc784500101160014d4ac092666007af47a08566b9a4f20bcd2f3137163024095e4d0167f8915010873a5f2ec2774b63bdc48b7d489effbe712bca7d8584a876daf65676310af2811ff5215ce5bd110d681abdf5aa476f19ab3d773795f710e2031fbe728a2831447e771ff7bc05e66ade293c81f2924704dbe62ef27293e383902013d82ec80b9f81217b8c912322fb3f505b1e542b4e58cebb7c128081fbe0d8584c280c8afa025011600143acfa10b486c9690c91ef8112f0472774d1c6b0500013dffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8099f0d44f01160014753b4b5ab0ed4efc550332c1d8ed84ff7a7251d200\"}"
+
+curl -X POST localhost:9888/build-transaction -d @build-contractUnlock-tx-payload.json >> output.txt
+
+curl -X POST localhost:9888/sign-transaction -d @sign-contractUnlock-tx-payload.json >> output.txt
+
+curl -X POST localhost:9888/list-unspent-outputs -d @get-contract-UTXO-payload.json

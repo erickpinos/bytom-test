@@ -1,0 +1,25 @@
+{
+  "base_transaction": null,
+  "actions": [
+    {
+      "account_id": "0UKOBDPC00A02",
+      "amount": 100000000,
+      "asset_id": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "type": "spend_account"
+    },
+    {
+      "account_id": "0UKOBDPC00A02",
+      "amount": 10000000000,
+      "asset_id": "82ec80b9f81217b8c912322fb3f505b1e542b4e58cebb7c128081fbe0d8584c2",
+      "type": "spend_account"
+    },
+    {
+      "amount": 10000000000,
+      "asset_id": "82ec80b9f81217b8c912322fb3f505b1e542b4e58cebb7c128081fbe0d8584c2",
+      "control_program": "200ff578cc3228fe697a47d178081a1d642e677c637f1c9ecb7434af81308735821600143acfa10b486c9690c91ef8112f0472774d1c6b0501647410cd9f697b7bae7cac6900c3c251547ac100c0",
+      "type": "control_program"
+    }
+  ],
+  "ttl": 0,
+  "time_range": 1521625823
+}
