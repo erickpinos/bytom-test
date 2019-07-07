@@ -49,7 +49,7 @@ control_program = compile_output_python.get('data').get('program')
 print(control_program)
 
 
-# Built the Transaction
+# Build the Transaction
 build_input_python = {
   "base_transaction": None,
   "actions": [
@@ -87,3 +87,10 @@ print(build_input_json)
 # Build the transaction
 build_output_json = requests.post('http://localhost:9888/build-transaction', data=build_input_json)
 print(build_output_json.text)
+
+# Get the transaction data
+build_output_python = json.loads(build_output_json.text)
+
+transaction_data = build_output_python.get('data')
+print(transaction_data)
+
