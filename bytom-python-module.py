@@ -11,86 +11,111 @@ mel_program = '001403fa045e4417f378243c2779f11b8204d5cd82a9'
 
 gold_id = '82ec80b9f81217b8c912322fb3f505b1e542b4e58cebb7c128081fbe0d8584c2'
 
-#response = requests.post('http://localhost:9888/build-transaction', data=data)
-
-#compilation-payload = open('compilation-payload.json')
-#build-contractLoad-txt-payload = open('build-contractLoad-tx-payload.json')
-#sign-contractLoad-txt-payload = open('sign-contractLoad-tx-payload.json')
-#submit-contractLoad-txt-payload = open('submit-contractLoad-tx-payload.json')
-
-# Compile the Contract
-
-# Make Python Version
 compile_input_python = {
     "contract": "contract LockPosition(expireBlockHeight: Integer, saver: Program, saver_key: PublicKey) locks lockAmount of lockAsset { clause expire(sig: Signature) { verify above(expireBlockHeight)  verify checkTxSig(saver_key, sig) lock lockAmount of lockAsset with saver } }",
     "args": [
         {"integer": 100 },
-	{"string": erick_program},
-	{"string": erick_address}
+        {"string": erick_program},
+        {"string": erick_address}
     ]
 }
-print(compile_input_python)
 
-# Make JSON Version
-with open("compile.json", "w") as write_file:
-    json.dump(compile_input_python, write_file)
-compile_input_json = open('compile.json')
-print(compile_input_json)
+def compileContract(contract):
+    data = json.dumps(contract)
+    response = requests.post('http://localhost:9888/compile', data=data)
+    result = json.loads(response.text).get('data')
+    return result
 
-# Compile
-compile_output_json = requests.post('http://localhost:9888/compile', data=compile_input_json)
-print(compile_output_json)
-print(compile_output_json.text)
+def getProgram(compiled_contract):
+    control_program = compiled_contract.get('program')
+    return control_program
 
-# Get the program
-compile_output_python = json.loads(compile_output_json.text)
-
-control_program = compile_output_python.get('data').get('program')
-print(control_program)
-
-
-# Build the Transaction
-build_input_python = {
-  "base_transaction": None,
-  "actions": [
-    {
-      "account_id": "0UKOBDPC00A02",
-      "amount": 100000000,
-      "asset_id": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-      "type": "spend_account"
-    },
-    {
-      "account_id": "0UKOBDPC00A02",
-      "amount": 10000000000,
-      "asset_id": "82ec80b9f81217b8c912322fb3f505b1e542b4e58cebb7c128081fbe0d8584c2",
-      "type": "spend_account"
-    },
-    {
-      "amount": 10000000000,
-      "asset_id": "82ec80b9f81217b8c912322fb3f505b1e542b4e58cebb7c128081fbe0d8584c2",
-      "control_program": control_program,
-      "type": "control_program"
+def buildTransaction(account_id, asset_id, control_program):
+    payload = {
+      "base_transaction": None,
+      "actions": [
+        {
+          "account_id": account_id,
+          "amount": 100000000,
+          "asset_id": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "type": "spend_account"
+        },
+        {
+          "account_id": account_id,
+          "amount": 1000000000,
+          "asset_id": asset_id,
+          "type": "spend_account"
+        },
+        {
+          "amount": 1000000000,
+          "asset_id": asset_id,
+          "control_program": control_program,
+          "type": "control_program"
+        }
+      ],
+      "ttl": 0,
+      "time_range": 1521625823
     }
-  ],
-  "ttl": 0,
-  "time_range": 1521625823
-}
 
+    data = json.dumps(payload)
+    response = requests.post('http://localhost:9888/build-transaction', data=data)
+    result = json.loads(response.text).get('data')
+    return result
 
-# Make JSON Version
-with open("build-input.json", "w") as write_file:
-    json.dump(build_input_python, write_file)
+def signTransaction():
+    info = {
+      "password": "12345",
+      "transaction": transaction_data
+    }
 
-build_input_json = open('build-input.json')
-print(build_input_json)
+    data = json.dumps(info)
+    response = requests.post('http://localhost:9888/sign-transaction', data=data)
+    result = json.loads(response.text)
+    return result
 
-# Build the transaction
-build_output_json = requests.post('http://localhost:9888/build-transaction', data=build_input_json)
-print(build_output_json.text)
+def getRawTransactionData(data):
+    result = data.get('transaction').get('raw_transaction')
+    return result
 
-# Get the transaction data
-build_output_python = json.loads(build_output_json.text)
+def submitTransaction():
+    info = {
+        "raw_transaction": raw_transaction
+    }
 
-transaction_data = build_output_python.get('data')
-print(transaction_data)
+    data = json.dumps(info)
+    response = requests.post('http://localhost:9888/submit-transaction', data=data)
+    result = json.loads(response.text)
+    return result
 
+def main():
+    print("calling compileContract")
+    compiled_contract = compileContract(compile_input_python)
+    print(compiled_contract)
+    print("finished compileContract")
+    print("\n")
+    print("calling getProgram")
+    control_program = getProgram(compiled_contract)
+    print(control_program)
+    print("finished getProgram")
+    print("\n")
+    print("calling buildTransaction")
+    transaction_data = buildTransaction(control_program)
+    print(transaction_data)
+    print("finished buildTransaction")
+    print("\n")
+    print("calling signTransaction")
+    signresult = signTransaction()
+    print(signresult)
+    print("finished signTransaction")
+    print("\n")
+    print("calling getRawTransactionData")
+    raw_transaction = getRawTransactionData()
+    print(raw_transaction)
+    print("finished getRawTransactionData")
+    print("\n")
+    print("calling submitTransaction")
+    submitted_transaction = submitTransaction()
+    print(submitted_transaction)
+    print("finished submitTransaction")
+
+main()
