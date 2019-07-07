@@ -11,26 +11,28 @@ mel_program = '001403fa045e4417f378243c2779f11b8204d5cd82a9'
 
 gold_id = '82ec80b9f81217b8c912322fb3f505b1e542b4e58cebb7c128081fbe0d8584c2'
 
-compile_input_python = {
-    "contract": "contract LockPosition(expireBlockHeight: Integer, saver: Program, saver_key: PublicKey) locks lockAmount of lockAsset { clause expire(sig: Signature) { verify above(expireBlockHeight)  verify checkTxSig(saver_key, sig) lock lockAmount of lockAsset with saver } }",
-    "args": [
-        {"integer": 100 },
-        {"string": erick_program},
-        {"string": erick_address}
-    ]
-}
-
-def compileContract(contract):
-    data = json.dumps(contract)
-    response = requests.post('http://localhost:9888/compile', data=data)
-    result = json.loads(response.text).get('data')
+def getProgram(data):
+    result = data.get('program')
     return result
 
-def getProgram(compiled_contract):
-    control_program = compiled_contract.get('program')
-    return control_program
+def getRawTransaction(data):
+    result = data.get('transaction').get('raw_transaction')
+    return result
 
-def buildTransaction(account_id, asset_id, control_program):
+def compileContract(program, address):
+    payload = {
+        "contract": "contract LockPosition(expireBlockHeight: Integer, saver: Program, saver_key: PublicKey) locks lockAmount of lockAsset { clause expire(sig: Signature) { verify above(expireBlockHeight)  verify checkTxSig(saver_key, sig) lock lockAmount of lockAsset with saver } }",
+        "args": [
+            {"integer": 100 },
+            {"string": program},
+            {"string": address}
+        ]
+    }
+
+    result = curl('compile',payload).get('data')
+    return result
+
+def buildTransaction(account_id, asset_id, amount, control_program):
     payload = {
       "base_transaction": None,
       "actions": [
@@ -42,12 +44,12 @@ def buildTransaction(account_id, asset_id, control_program):
         },
         {
           "account_id": account_id,
-          "amount": 1000000000,
+          "amount": amount,
           "asset_id": asset_id,
           "type": "spend_account"
         },
         {
-          "amount": 1000000000,
+          "amount": amount,
           "asset_id": asset_id,
           "control_program": control_program,
           "type": "control_program"
@@ -57,65 +59,67 @@ def buildTransaction(account_id, asset_id, control_program):
       "time_range": 1521625823
     }
 
-    data = json.dumps(payload)
-    response = requests.post('http://localhost:9888/build-transaction', data=data)
-    result = json.loads(response.text).get('data')
+    result = curl('build-transaction',payload).get('data')
     return result
 
-def signTransaction():
-    info = {
+def signTransaction(transaction):
+    payload = {
       "password": "12345",
-      "transaction": transaction_data
+      "transaction": transaction
     }
 
-    data = json.dumps(info)
-    response = requests.post('http://localhost:9888/sign-transaction', data=data)
-    result = json.loads(response.text)
+    result = curl('sign-transaction',payload).get('data')
     return result
 
-def getRawTransactionData(data):
-    result = data.get('transaction').get('raw_transaction')
-    return result
-
-def submitTransaction():
-    info = {
+def submitTransaction(raw_transaction):
+    payload = {
         "raw_transaction": raw_transaction
     }
 
-    data = json.dumps(info)
-    response = requests.post('http://localhost:9888/submit-transaction', data=data)
+    result = curl('submit-transaction',payload).get('data')
+    return result
+
+def curl(command, payload):
+    url = 'http://localhost:9888/' + command
+    data = json.dumps(payload)
+    response = requests.post(url, data=data)
     result = json.loads(response.text)
     return result
 
 def main():
     print("calling compileContract")
-    compiled_contract = compileContract(compile_input_python)
+    compiled_contract = compileContract(erick_program, erick_address)
     print(compiled_contract)
     print("finished compileContract")
     print("\n")
+    
     print("calling getProgram")
     control_program = getProgram(compiled_contract)
     print(control_program)
     print("finished getProgram")
     print("\n")
+
     print("calling buildTransaction")
-    transaction_data = buildTransaction(control_program)
-    print(transaction_data)
+    build_output = buildTransaction(erick_account, gold_id, 100000000, control_program)
+    print(build_output)
     print("finished buildTransaction")
     print("\n")
+
     print("calling signTransaction")
-    signresult = signTransaction()
-    print(signresult)
+    sign_output = signTransaction(build_output)
+    print(sign_output)
     print("finished signTransaction")
     print("\n")
+
     print("calling getRawTransactionData")
-    raw_transaction = getRawTransactionData()
+    raw_transaction = getRawTransaction(sign_output)
     print(raw_transaction)
     print("finished getRawTransactionData")
     print("\n")
+
     print("calling submitTransaction")
-    submitted_transaction = submitTransaction()
-    print(submitted_transaction)
+    submit_output = submitTransaction(raw_transaction)
+    print(submit_output)
     print("finished submitTransaction")
 
 main()
